@@ -2,6 +2,7 @@ use chrono::naive::NaiveDate;
 use chrono::Duration;
 use primes::is_prime;
 use rstest::rstest;
+use std::mem;
 use structopt::StructOpt;
 
 #[derive(StructOpt)]
@@ -11,6 +12,24 @@ struct Period {
     from: String,
     #[structopt(name = "TO")]
     to: String,
+}
+
+struct _Period {
+    from: NaiveDate,
+    to: NaiveDate,
+}
+
+impl Iterator for _Period {
+    type Item = NaiveDate;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.from <= self.to {
+            let next = self.from + Duration::days(1);
+            Some(mem::replace(&mut self.from, next))
+        } else {
+            None
+        }
+    }
 }
 
 pub fn date_to_int(date: NaiveDate) -> u64 {
@@ -84,5 +103,28 @@ mod tests {
         // 並列化
         // https://caddi.tech/archives/1849
         assert_eq!(list_prime_numbers(number), expected);
+    }
+
+    #[rstest(from, to, expected,
+        case(
+            NaiveDate::from_ymd(2021, 8, 1),
+            NaiveDate::from_ymd(2021, 8, 1),
+            vec![NaiveDate::from_ymd(2021, 8, 1)],
+        ),
+        case(
+            NaiveDate::from_ymd(2021, 8, 1),
+            NaiveDate::from_ymd(2021, 8, 2),
+            vec![NaiveDate::from_ymd(2021, 8, 1), NaiveDate::from_ymd(2021, 8, 2)],
+        ),
+        case(
+            NaiveDate::from_ymd(2021, 8, 1),
+            NaiveDate::from_ymd(2021, 8, 3),
+            vec![NaiveDate::from_ymd(2021, 8, 1), NaiveDate::from_ymd(2021, 8, 2), NaiveDate::from_ymd(2021, 8, 3)],
+        ),
+    )]
+    fn range_period(from: NaiveDate, to: NaiveDate, expected: Vec<NaiveDate>) {
+        let period = _Period { from: from, to: to };
+        let actual: Vec<NaiveDate> = period.collect();
+        assert_eq!(actual, expected);
     }
 }
