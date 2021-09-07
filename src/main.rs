@@ -19,6 +19,20 @@ struct _Period {
     to: NaiveDate,
 }
 
+impl _Period {
+    fn prime_days(self) -> Vec<NaiveDate> {
+        let mut days: Vec<NaiveDate> = vec![];
+        let mut dt = self.from;
+        while dt <= self.to {
+            if is_prime(date_to_int(dt)) {
+                days.push(dt);
+            }
+            dt = dt + Duration::days(1);
+        }
+        days
+    }
+}
+
 impl Iterator for _Period {
     type Item = NaiveDate;
 
@@ -69,15 +83,14 @@ pub fn list_prime_numbers(number: u64) -> Vec<u64> {
 
 fn main() {
     let period = Period::from_args();
-    let from_date = string_to_date(&period.from);
-    let to_date = string_to_date(&period.to);
-    let mut dt = from_date;
+    let _period = _Period {
+        from: string_to_date(&period.from),
+        to: string_to_date(&period.to),
+    };
+    let prime_days = _period.prime_days();
 
-    while dt <= to_date {
-        if is_prime(date_to_int(dt)) {
-            println!("{}", dt.format("%Y-%m-%d").to_string());
-        }
-        dt = dt + Duration::days(1);
+    for day in prime_days {
+        println!("{}", day.format("%Y-%m-%d").to_string());
     }
 }
 
