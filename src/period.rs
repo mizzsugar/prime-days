@@ -3,12 +3,12 @@ use chrono::Duration;
 use primes::is_prime;
 use std::mem;
 
-pub struct _Period {
+pub struct Period {
     pub from: NaiveDate,
     pub to: NaiveDate,
 }
 
-impl _Period {
+impl Period {
     pub fn prime_days(self) -> Vec<NaiveDate> {
         let mut days: Vec<NaiveDate> = vec![];
         let mut dt = self.from;
@@ -22,7 +22,7 @@ impl _Period {
     }
 }
 
-impl Iterator for _Period {
+impl Iterator for Period {
     type Item = NaiveDate;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -114,7 +114,7 @@ mod tests {
         ),
     )]
     fn range_period(from: NaiveDate, to: NaiveDate, expected: Vec<NaiveDate>) {
-        let period = _Period { from: from, to: to };
+        let period = Period { from: from, to: to };
         let actual: Vec<NaiveDate> = period.collect();
         assert_eq!(actual, expected);
     }

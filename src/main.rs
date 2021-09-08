@@ -12,7 +12,7 @@ struct Period {
 
 fn main() {
     let period = Period::from_args();
-    let _period = period::_Period {
+    let _period = period::Period {
         from: period::string_to_date(&period.from),
         to: period::string_to_date(&period.to),
     };
